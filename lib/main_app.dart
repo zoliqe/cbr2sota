@@ -31,6 +31,9 @@ class MainApp extends PolymerElement {
   String sotaRef;
 
   @property
+  int exchCount = 0;
+
+  @property
   String cabrillo;
 
   @property
@@ -43,20 +46,34 @@ class MainApp extends PolymerElement {
 
   @reflectable
   void fillValues(Event e, var detail) {
-    log = const Cabrillo3Codec().decode(cabrillo, logType: LogType.DXPEDITION);
-    if (callsign == null || callsign.isEmpty) {
-      set('callsign', log.owner);
+    this.log = const Cabrillo3Codec().decode(this.cabrillo, logType: LogType.DXPEDITION, exchCount: this.exchCount);
+    if (this.callsign == null || this.callsign.isEmpty) {
+      set('callsign', this.log.owner);
     }
-    if (sotaRef == null || sotaRef.isEmpty) {
-      set('sotaRef', log.name);
+    if (this.sotaRef == null || this.sotaRef.isEmpty) {
+      set('sotaRef', this.log.name);
     }
   }
 
 //  @Listen("convert")
   @reflectable
   void convert(Event e, var detail) {
-    var out = const SotaCsvCodec().encode(log);
+    if (this.log == null) {
+      return;
+    }
+    this.log.owner = this.callsign;
+    this.log.name = this.sotaRef;
+    var out = const SotaCsvCodec().encode(this.log);
     set('csv', out);
+  }
+
+  @reflectable
+  void clear(Event e, var detail) {
+    this.log = null;
+    set('cabrillo', '');
+    set('callsign', '');
+    set('sotaRef', '');
+    set('csv', '');
   }
 
   // Optional lifecycle methods - uncomment if needed.
